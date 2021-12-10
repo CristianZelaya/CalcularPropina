@@ -174,8 +174,17 @@ function agregarPlatillo( producto ) {
     // Limpiar el html previo
     limpiarHTML();
 
-    // Mostrar Resumen
-    actualizarResumen();
+    // Pedido vacio 
+    if( cliente.pedido.length ) {
+
+        // Mostrar Resumen
+        actualizarResumen();
+
+    } else {
+
+        mensajePedidoVacio();
+
+    }
 
 }
 
@@ -213,7 +222,7 @@ function actualizarResumen() {
     heading.textContent = 'Platillos Consumidos';
     heading.classList.add('my-4', 'text-center');
 
-    // Iterar sobre el rray de contenido
+    // Iterar sobre el array de contenido
     const grupo = document.createElement('ul');
     grupo.classList.add('list-group');
 
@@ -256,6 +265,18 @@ function actualizarResumen() {
         subTotalValor.classList.add('fw-normal');
         subTotalValor.textContent = calcularSubTotal( precio, cantidad);
 
+        // Botón para eliminar
+        const btnEliminar = document.createElement('button');
+        btnEliminar.classList.add('btn-danger');
+        btnEliminar.textContent = 'Eliminar del pedido';
+
+        // Funcion para eliminar del pedido
+        btnEliminar.onclick = () => {
+
+            eliminarProducto( id );
+
+        }
+
         // Agregar valor a sus contenedores
         cantidadEl.appendChild( cantidadValor );
         precioEl.appendChild( precioValor );
@@ -266,6 +287,7 @@ function actualizarResumen() {
         lista.appendChild( cantidadEl );
         lista.appendChild( precioEl );
         lista.appendChild( subTotalEl );
+        lista.appendChild( btnEliminar );
 
         // Agregar lista al grupo principal
         grupo.appendChild( lista );
@@ -299,4 +321,44 @@ function calcularSubTotal( precio, cantidad ) {
 
     return `$ ${ precio * cantidad }`;
     
+}
+
+function eliminarProducto( id ) {
+
+    const { pedido } = cliente;
+    const resultado = pedido.filter( articulo => articulo.id !== id );
+    cliente.pedido = [ ...resultado ];
+
+    // Limpia el html
+    limpiarHTML();
+
+    // Pedido vacio 
+    if( cliente.pedido.length ) {
+
+        // Mostrar Resumen
+        actualizarResumen();
+
+    } else {
+
+        mensajePedidoVacio();
+
+    }
+
+    // El producto se elimino por lo tanto regresamos la cantidad a 0 en el formulario
+    const productoEliminado =  `#producto-${id}`;
+    const inputEliminado = document.querySelector(productoEliminado);
+    inputEliminado.value = 0;
+
+}
+
+function mensajePedidoVacio() {
+
+    const contenido = document.querySelector('#resumen .contenido');
+
+    const texto = document.createElement('p');
+    texto.classList.add('text-center');
+    texto.textContent = 'Añade los elemento del pedido';
+
+    contenido.appendChild( texto );
+
 }
